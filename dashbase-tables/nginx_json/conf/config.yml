@@ -1,0 +1,83 @@
+dashbase:
+  baseDir: ${DASHBASE_INDEX_DIR}
+  readerCacheSize: 10000
+
+  firehose:
+      type: kafka_10
+      params:
+          hosts: ${KAFKA_URL}
+          groupId: local_dashbase_kafka
+          topic: nginx_logs
+          partitions: "0"
+# NOTE: the following setting does not seem to make a difference.
+#          kafkaProps:
+#            max.partition.fetch.bytes: 4048576
+#            receive.buffer.bytes: 2455360
+
+  cluster:
+    name: kafka_nginx
+    url: ${ZOOKEEPER_URL}
+
+  indexer:
+    maxDocsPerSegment: 4000000
+    numIndexingThreads: 4
+    #maxNumConcurrentBuilding: 3
+    maxIndexingDelayInSec: 180
+
+  retention:
+    numDays: 7
+
+  parser:
+    type: json
+    params:
+      pattern:
+        timeFormat: now
+        schema:
+          - name: host
+            type: meta
+          - name: request
+            type: text
+          - name: response
+            type: meta
+          - name: bytesSent
+            type: numeric
+          - name: error
+            type: meta
+          - name: msg
+            type: text
+          - name: level
+            type: meta
+          - name: agent
+            type: text
+server:
+  applicationConnectors:
+    - type: http
+      port: ${PORT}
+  applicationContextPath: /
+  adminContextPath: /admin
+  adminConnectors:
+      - type: http
+        port: ${ADMINPORT}
+
+metrics:
+  reporters:
+    - type: dashbase
+      url: ${MONITOR_URL}
+      includes:
+        - ^jvm.*$
+        - ^dashbase.*$
+      useRegexFilters: true
+      frequency: 5 seconds
+
+logging:
+  level: INFO
+  appenders:
+      - type: file
+        currentLogFilename: ../logs/dashbase-kafka-nginx.log
+        archive: true
+        archivedLogFilenamePattern: ../logs/dashbase-kafka-nginx-%d.log
+        archivedFileCount: 9
+        timeZone: UTC
+      - type: dashbase
+        url: ${MONITOR_URL}
+        timeZone: UTC

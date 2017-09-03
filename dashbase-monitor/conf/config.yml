@@ -1,0 +1,57 @@
+dashbase:
+  # cluster configuration
+  cluster:
+    name: _system
+    url: ${ZOOKEEPER_URL}
+
+  # following configurations only applies to server mode
+
+  # base directory
+  baseDir: /data/index/_system
+
+  # indexing parameters (optional)
+  indexer:
+     maxDocsPerSegment: 100000
+     maxIndexingDelayInSec: 10
+
+  retention:
+    expirationHandler:
+      params:
+      type: purge
+    numDays: 7
+
+  parser:
+    type: _system
+
+server:
+  applicationConnectors:
+    - type: http
+      port: ${PORT}
+  applicationContextPath: /
+  adminContextPath: /admin
+  adminConnectors:
+      - type: http
+        port: ${ADMINPORT}
+  requestLog:
+    appenders: []
+metrics:
+  reporters:
+    - type: dashbase
+      url: "localhost:${PORT}"
+      includes:
+        - ^jvm.*$
+        - ^dashbase.*$
+      useRegexFilters: true
+      frequency: 5 seconds
+logging:
+  level: INFO
+  appenders:
+      - type: file
+        currentLogFilename: ../logs/system-monitor.log
+        archive: true
+        archivedLogFilenamePattern: ../logs/system-monitor-%d.log
+        archivedFileCount: 9
+        timeZone: UTC
+      - type: dashbase
+        url: "localhost:${PORT}"
+        timeZone: UTC

@@ -1,0 +1,53 @@
+prefix: ""
+distribution: nightly
+reinstall: True
+env:
+  DASHBASE_INDEX_DIR: /data/index/kafka-nginx-json
+  KAFKA_URL: localhost:9092
+  ZOOKEEPER_URL: localhost:2181
+  MONITOR_URL: localhost:9888
+  API_HOST: localhost
+  API_PORT: 9876
+  DEPLOYMENT_NAME: kafka-nginx
+
+services:
+
+  _system:
+    type: monitor
+    config: dashbase-monitor/conf/config.yml
+    defaults:
+      host: local
+      port: 9888
+      admin_port: 9988
+      heap_opts: "-Xmx1g -Xms1g -XX:NewSize=512m"
+    partitions:
+      0:
+
+  nginx_json:
+    type: table
+    config: dashbase-tables/nginx_json/conf/config.yml
+    defaults:
+      host: local
+      port: 7888
+      admin_port: 7988
+      heap_opts: "-Xmx8g -Xms4g -XX:NewSize=1g"
+    partitions:
+      0:
+  web:
+    type: web
+    host: local
+    port: 8080
+    admin_port: 8180
+    heap_opts: "-Xmx512m -Xms256m -XX:NewSize=256m"
+    config: dashbase-web/conf/config.yml
+
+  api:
+    type: api
+    host: local
+    port: 9876
+    admin_port: 9976
+    heap_opts: "-Xmx1g -Xms1g -XX:NewSize=512m"
+    config: dashbase-api/conf/config.yml
+hosts:
+  staging:
+    hostname: localhost

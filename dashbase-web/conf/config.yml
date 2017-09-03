@@ -1,0 +1,24 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: ${PORT}
+  applicationContextPath: /
+  adminContextPath: /admin
+  adminConnectors:
+    - type: http
+      port: ${ADMINPORT}
+
+# auth:
+#  host: https://staging.dashbase.io:9678
+
+website:
+  cdn: "https://cdn.domain.com"
+  domain: "https://www.domain.com"
+  name: "Dashbase Web"
+
+backend:
+  host: ${API_HOST}
+  port: ${API_PORT}
+
+# alerts:
+#   host: "http://staging.dashbase.io:9898"
