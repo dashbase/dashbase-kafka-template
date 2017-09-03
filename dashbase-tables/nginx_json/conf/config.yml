@@ -22,7 +22,7 @@ dashbase:
     maxDocsPerSegment: 4000000
     numIndexingThreads: 4
     #maxNumConcurrentBuilding: 3
-    maxIndexingDelayInSec: 180
+    maxIndexingDelayInSec: 15
 
   retention:
     numDays: 7
