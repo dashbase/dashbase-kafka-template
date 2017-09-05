@@ -1,4 +1,4 @@
-prefix: ""
+prefix: "kafka"
 distribution: nightly
 reinstall: True
 env:

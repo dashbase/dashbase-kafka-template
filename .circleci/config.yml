@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    machine:
+      enabled: true
+    working_directory: ~/dashbase-kafka-template
+    steps:
+      - checkout
+      - run:
+          name: Install AWS CLI
+          command: pip install awscli --upgrade --user
+      - run:
+          name: Create Package
+          command: tar -zcvf ~/dashbase-kafka-template.tar.gz --exclude="*.git*" --exclude="*.circle*" -C ~/ dashbase-kafka-template
+      - run:
+          name: Sync Package to S3
+          command: aws s3 cp ~/dashbase-kafka-template.tar.gz s3://dashbase-public/dashbase-kafka-template/
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - master
