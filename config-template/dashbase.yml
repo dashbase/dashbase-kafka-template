@@ -14,7 +14,7 @@ services:
 
   _system:
     type: monitor
-    config: dashbase-monitor/conf/config.yml
+    config: dashbase-tables/_system/conf/config.yml
     defaults:
       host: local
       port: 9888
