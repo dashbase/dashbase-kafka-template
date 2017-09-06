@@ -1,13 +1,13 @@
 dashbase:
-  baseDir: ${DASHBASE_INDEX_DIR}
+  baseDir: /data/index
   readerCacheSize: 10000
 
   firehose:
       type: kafka_10
       params:
-          hosts: ${KAFKA_URL}
-          groupId: local_dashbase_kafka
-          topic: nginx_logs
+          hosts: ${KAFKA_BROKER_HOST}
+          groupId: ${KAFKA_GROUPID}
+          topic: ${KAFKA_TOPIC}
           partitions: "0"
 # NOTE: the following setting does not seem to make a difference.
 #          kafkaProps:
@@ -15,12 +15,12 @@ dashbase:
 #            receive.buffer.bytes: 2455360
 
   cluster:
-    name: kafka_nginx
+    name: kafka
     url: ${ZOOKEEPER_URL}
 
   indexer:
-    maxDocsPerSegment: 4000000
-    numIndexingThreads: 4
+    maxDocsPerSegment: 1000000
+    # numIndexingThreads: 3
     #maxNumConcurrentBuilding: 3
     maxIndexingDelayInSec: 15
 
@@ -73,9 +73,9 @@ logging:
   level: INFO
   appenders:
       - type: file
-        currentLogFilename: ../logs/dashbase-kafka-nginx.log
+        currentLogFilename: ../logs/dashbase-kafka.log
         archive: true
-        archivedLogFilenamePattern: ../logs/dashbase-kafka-nginx-%d.log
+        archivedLogFilenamePattern: ../logs/dashbase-kafka-%d.log
         archivedFileCount: 9
         timeZone: UTC
       - type: dashbase

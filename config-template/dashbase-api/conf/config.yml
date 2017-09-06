@@ -15,7 +15,7 @@ metrics:
     - type: dashbase
       url: ${MONITOR_URL}
       meta:
-        name: dashbase-staging
+        name: dashbase-internal
         type: dashbase-api
       includes:
         - ^jvm.*$

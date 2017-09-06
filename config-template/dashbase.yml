@@ -1,14 +1,12 @@
 prefix: "kafka"
-distribution: nightly
-reinstall: True
+distribution: release
+# reinstall: false
 env:
-  DASHBASE_INDEX_DIR: /data/index/kafka-nginx-json
-  KAFKA_URL: localhost:9092
   ZOOKEEPER_URL: localhost:2181
   MONITOR_URL: localhost:9888
   API_HOST: localhost
   API_PORT: 9876
-  DEPLOYMENT_NAME: kafka-nginx
+  DEPLOYMENT_NAME: my-kafka
 
 services:
 
@@ -23,9 +21,9 @@ services:
     partitions:
       0:
 
-  nginx_json:
+  table:
     type: table
-    config: dashbase-tables/nginx_json/conf/config.yml
+    config: dashbase-tables/kafka/conf/config.yml
     defaults:
       host: local
       port: 7888
@@ -33,6 +31,11 @@ services:
       heap_opts: "-Xmx8g -Xms4g -XX:NewSize=1g"
     partitions:
       0:
+        env:
+          KAFKA_BROKER_HOST: localhost:9092
+          KAFKA_GROUPID: my-groupid
+          KAFKA_TOPIC: my-topic
+
   web:
     type: web
     host: local
@@ -48,6 +51,7 @@ services:
     admin_port: 9976
     heap_opts: "-Xmx1g -Xms1g -XX:NewSize=512m"
     config: dashbase-api/conf/config.yml
+
 hosts:
   local:
     hostname: localhost

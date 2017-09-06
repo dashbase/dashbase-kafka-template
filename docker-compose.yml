@@ -1,0 +1,105 @@
+version: '2'
+
+services:
+  zookeeper:
+    image: zookeeper
+    mem_limit: 500m
+    restart: on-failure
+    ports:
+      - "2181:2181"
+    networks:
+      - net
+  monitor:
+    image: dashbase/table
+    mem_limit: 4g
+    restart: on-failure
+    depends_on:
+      - zookeeper
+    ports:
+      - "9888:9888"
+      - "9988:9988"
+    networks:
+      - net
+    volumes:
+      - ./config-template/dashbase-tables/_system/conf:/app/kafka-configurations/dashbase-tables/_system/conf:ro
+      - ./logs:/app/kafka-configurations/dashbase-tables/_system/logs:rw
+      - ./logs:/root/.dashbase/logs:rw
+      - ./index:/data/index:rw
+    links:
+      - zookeeper
+    environment:
+      - ZOOKEEPER_URL=zookeeper:2181
+      - LOG=/root/.dashbase/logs/debug.log
+      - COMMAND=dashbase-cli --no-verify --distribution release service start table -p 9888 -ap 9988 -r 0 -c /app/kafka-configurations/dashbase-tables/_system/conf/config.yml kafka-_system-0
+  table:
+    image: dashbase/table
+    mem_limit: 4g
+    restart: on-failure
+    depends_on:
+      - zookeeper
+      - monitor
+    networks:
+      - net
+    volumes:
+      - ./config-template/dashbase-tables/kafka/conf:/app/kafka-configurations/dashbase-tables/kafka/conf:ro
+      - ./logs:/app/kafka-configurations/dashbase-tables/kafka/logs:rw
+      - ./logs:/root/.dashbase/logs:rw
+      - ./index:/data/index:rw
+    links:
+      - zookeeper
+    env_file:
+      - kafka_config.env
+    environment:
+      - ZOOKEEPER_URL=zookeeper:2181
+      - MONITOR_URL=monitor:9888
+      - LOG=/root/.dashbase/logs/debug.log
+      - COMMAND=dashbase-cli --no-verify --distribution release service start table -p 7889 -ap 7989 -r 0 -c /app/kafka-configurations/dashbase-tables/kafka/conf/config.yml kafka-table-0
+  api:
+    image: dashbase/api
+    mem_limit: 1g
+    restart: on-failure
+    depends_on:
+      - zookeeper
+      - monitor
+      - table
+    ports:
+      - "9876:9876"
+      - "9976:9976"
+    networks:
+      - net
+    volumes:
+      - ./config-template/dashbase-api/conf:/app/kafka-configurations/dashbase-api/conf:ro
+      - ./logs:/app/kafka-configurations/dashbase-api/logs:rw
+      - ./logs:/root/.dashbase/logs:rw
+    links:
+      - zookeeper
+    environment:
+      - ZOOKEEPER_URL=zookeeper:2181
+      - MONITOR_URL=monitor:9888
+      - LOG=/root/.dashbase/logs/debug.log
+      - COMMAND=dashbase-cli --no-verify --distribution release service start api -p 9876 -ap 9976 -c /app/kafka-configurations/dashbase-api/conf/config.yml kafka-api
+  web:
+    image: dashbase/web
+    mem_limit: 1g
+    restart: on-failure
+    depends_on:
+      - api
+    ports:
+      - "8080:8080"
+      - "8180:8180"
+    networks:
+      - net
+    volumes:
+      - ./config-template/dashbase-web/conf:/app/kafka-configurations/dashbase-web/conf:ro
+      - ./logs:/root/.dashbase/logs:rw
+    links:
+      - api
+    environment:
+      - API_PORT=9876
+      - API_HOST=api
+      - LOG=/root/.dashbase/logs/debug.log
+      - COMMAND=dashbase-cli --no-verify --distribution release service start web -p 8080 -ap 8180 -c /app/kafka-configurations/dashbase-web/conf/config.yml kafka-web
+
+networks:
+  net:
+    driver: bridge
