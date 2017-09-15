@@ -100,6 +100,22 @@ services:
       - LOG=/root/.dashbase/logs/debug.log
       - COMMAND=dashbase-cli --no-verify --distribution release service start web -p 8080 -ap 8180 -c /app/kafka-configurations/dashbase-web/conf/config.yml kafka-web
 
+  grafana:
+    image: dashbase/grafana
+    mem_limit: 2g
+    restart: on-failure
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+    networks:
+      - net
+    links:
+      - api
+    environment:
+      - COMMAND=/root/grafana/bin/grafana-server & python /root/setup_grafana.py
+      - LOG=/root/grafana/data/log/grafana.log
+
 networks:
   net:
     driver: bridge
