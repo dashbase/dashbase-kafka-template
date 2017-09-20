@@ -7,7 +7,7 @@ dashbase:
       params:
           hosts: ${KAFKA_BROKER}
           groupId: ${KAFKA_GROUPID}
-          topic: ${KAFKA_TOPIC}
+          topic: warged-${KAFKA_TOPIC}
 
   cluster:
     name: filebeat
