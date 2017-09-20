@@ -1,0 +1,18 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: ${PORT}
+  applicationContextPath: /
+  adminContextPath: /admin
+  adminConnectors:
+    - type: http
+      port: ${ADMINPORT}
+
+website:
+  cdn: "https://cdn.domain.com"
+  domain: "https://www.domain.com"
+  name: "Dashbase Web"
+
+backend:
+  host: ${API_HOST}
+  port: ${API_PORT}

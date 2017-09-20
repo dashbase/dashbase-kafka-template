@@ -1,0 +1,59 @@
+dashbase:
+  baseDir: /data/index
+  readerCacheSize: 10000
+
+  firehose:
+      type: kafka_10
+      params:
+          hosts: ${KAFKA_BROKER_HOST}
+          groupId: ${KAFKA_GROUPID}
+          topic: ${KAFKA_TOPIC}
+
+  cluster:
+    name: filebeat
+    url: ${ZOOKEEPER_URL}
+
+  indexer:
+    maxDocsPerSegment: 1000000
+    # numIndexingThreads: 3
+    # maxNumConcurrentBuilding: 3
+    maxIndexingDelayInSec: 15
+
+  retention:
+    numDays: 7
+
+  parser:
+    type: avro_native
+
+server:
+  applicationConnectors:
+    - type: http
+      port: ${PORT}
+  applicationContextPath: /
+  adminContextPath: /admin
+  adminConnectors:
+      - type: http
+        port: ${ADMINPORT}
+
+metrics:
+  reporters:
+    - type: dashbase
+      url: ${MONITOR_URL}
+      includes:
+        - ^jvm.*$
+        - ^dashbase.*$
+      useRegexFilters: true
+      frequency: 5 seconds
+
+logging:
+  level: INFO
+  appenders:
+      - type: file
+        currentLogFilename: ../logs/dashbase-filebeat.log
+        archive: true
+        archivedLogFilenamePattern: ../logs/dashbase-filebeat-%d.log
+        archivedFileCount: 9
+        timeZone: UTC
+      - type: dashbase
+        url: ${MONITOR_URL}
+        timeZone: UTC
