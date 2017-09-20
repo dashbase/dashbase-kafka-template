@@ -6,9 +6,9 @@
 REGION="us-west-1"
 KEYPAIR="dashbase-test"
 INSTANCE_TYPE="r4.xlarge"
-SECURITY_GROUP="sg-9ca824fa"
-VPC="vpc-0c98c369"
-SUBNET="subnet-e82379b1"
+SECURITY_GROUP="sg-12179d74"
+VPC="vpc-87104ce3"
+SUBNET="subnet-4a0e0112"
 
 
 

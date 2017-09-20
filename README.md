@@ -10,7 +10,7 @@
 1. Change the env section for the `table` service to match the relevant information.
 ```
 env:
-  KAFKA_BROKER_HOST: localhost:9092
+  KAFKA_BROKER: localhost:9092
   KAFKA_GROUPID: my-groupid
   KAFKA_TOPIC: my-topic
 ```

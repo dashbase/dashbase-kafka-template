@@ -6,14 +6,13 @@ services:
     cpu_shares: 2048
     mem_limit: 4g
     volumes:
-      - /home/ec2-user/logs:/app/kafka-configurations/dashbase-tables/kafka/logs:rw
+      - /home/ec2-user/logs:/app/ecs-configurations/dashbase-tables/filebeat/logs:rw
       - /home/ec2-user/logs:/root/.dashbase/logs:rw
       - /home/ec2-user/index:/data/index:rw
     env_file:
       - saas_kafka_config.env
     environment:
-      - ZOOKEEPER_URL=13.56.187.40:2181
-      - MONITOR_URL=localhost:9888
+      - ZOOKEEPER_URL=10.0.0.124:2181
       - LOG=/root/.dashbase/logs/debug.log
       - COMMAND=sleep 10s && dashbase-cli template download ecs-configurations --path /app/ && dashbase-cli --no-verify --distribution release service start table -p 7889 -ap 7989 -r 0 -c /app/ecs-configurations/dashbase-tables/filebeat/conf/config.yml saas-table-0
   api:
@@ -24,19 +23,20 @@ services:
       - "9876:9876"
       - "9976:9976"
     volumes:
-      - /home/ec2-user/logs:/app/kafka-configurations/dashbase-api/logs:rw
+      - /home/ec2-user/logs:/app/ecs-configurations/dashbase-api/logs:rw
       - /home/ec2-user/logs:/root/.dashbase/logs:rw
     links:
       - table
+    env_file:
+      - saas_kafka_config.env
     environment:
-      - ZOOKEEPER_URL=13.56.187.40:2181
-      - MONITOR_URL=localhost:9888
+      - ZOOKEEPER_URL=10.0.0.124:2181
       - LOG=/root/.dashbase/logs/debug.log
       - COMMAND=sleep 10s && dashbase-cli template download ecs-configurations --path /app/ && dashbase-cli --no-verify --distribution release service start api -p 9876 -ap 9976 -c /app/ecs-configurations/dashbase-api/conf/config.yml saas-api
   web:
     image: 977933106931.dkr.ecr.us-west-1.amazonaws.com/dashbase/web
     cpu_shares: 512
-    mem_limit: 1g
+    mem_limit: 512m
     ports:
       - "8080:8080"
       - "8180:8180"

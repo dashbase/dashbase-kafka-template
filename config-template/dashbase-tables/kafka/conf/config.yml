@@ -5,7 +5,7 @@ dashbase:
   firehose:
       type: kafka_10
       params:
-          hosts: ${KAFKA_BROKER_HOST}
+          hosts: ${KAFKA_BROKER}
           groupId: ${KAFKA_GROUPID}
           topic: ${KAFKA_TOPIC}
           partitions: "0"
