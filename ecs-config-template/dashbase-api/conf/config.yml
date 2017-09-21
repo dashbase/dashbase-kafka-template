@@ -15,6 +15,16 @@ metrics:
     - type: dashbase
       url: ${MONITOR_URL}
       meta:
+        name: ${KAFKA_GROUPID}-api
+        type: dashbase-api
+      includes:
+        - ^jvm.*$
+        - ^dashbase.*$
+      useRegexFilters: true
+      frequency: 5 seconds
+    - type: dashbase
+      url: ${LOCAL_MONITOR_URL}
+      meta:
         name: dashbase-internal
         type: dashbase-api
       includes:

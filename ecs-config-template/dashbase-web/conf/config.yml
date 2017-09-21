@@ -16,3 +16,16 @@ website:
 backend:
   host: ${API_HOST}
   port: ${API_PORT}
+
+logging:
+  level: INFO
+  appenders:
+      - type: file
+        currentLogFilename: ../logs/dashbase-web.log
+        archive: true
+        archivedLogFilenamePattern: ../logs/dashbase-web-%d.log
+        archivedFileCount: 9
+        timeZone: UTC
+      - type: dashbase
+        url: ${MONITOR_URL}
+        timeZone: UTC

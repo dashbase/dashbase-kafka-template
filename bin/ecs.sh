@@ -4,9 +4,9 @@
 
 # ECS Settings
 REGION="us-west-1"
-KEYPAIR="dashbase-test"
+KEYPAIR="dashbase-saas"
 INSTANCE_TYPE="r4.xlarge"
-SECURITY_GROUP="sg-12179d74"
+SECURITY_GROUP="sg-69c95d0f"
 VPC="vpc-87104ce3"
 SUBNET="subnet-4a0e0112"
 
@@ -33,7 +33,7 @@ function verify_cluster_name {
 # init cluster
 function create {
   ecs-cli up --cluster ${1} --region ${REGION} --keypair ${KEYPAIR} \
-    --capability-iam --size 1 --vpc ${VPC} --subnets ${SUBNET}  \
+    --instance-role ecsInstanceRole --size 1 --vpc ${VPC} --subnets ${SUBNET}  \
     --security-group ${SECURITY_GROUP} --instance-type ${INSTANCE_TYPE}
 }
 

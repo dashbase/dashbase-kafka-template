@@ -1,10 +1,29 @@
 version: '2'
 
 services:
+  monitor:
+    image: dashbase/table
+    cpu_shares: 512
+    mem_limit: 4g
+    ports:
+      - "9888:9888"
+      - "9988:9988"
+    volumes:
+      - /home/ec2-user/logs:/app/ecs-configurations/dashbase-tables/_system/logs:rw
+      - /home/ec2-user/logs:/root/.dashbase/logs:rw
+      - /home/ec2-user/index:/data/index:rw
+    links:
+      - zookeeper
+    env_file:
+      - saas_kafka_config.env
+    environment:
+      - ZOOKEEPER_URL=10.0.0.124:2181
+      - LOG=/root/.dashbase/logs/debug.log
+      - COMMAND=sleep 10s && dashbase-cli template download ecs-configurations --path /app/ dashbase-cli && --no-verify --distribution release service start table -p 9888 -ap 9988 -r 0 -c /app/ecs-configurations/dashbase-tables/_system/conf/config.yml saas-_system-0
   table:
     image: 977933106931.dkr.ecr.us-west-1.amazonaws.com/dashbase/table
     cpu_shares: 2048
-    mem_limit: 4g
+    mem_limit: 8g
     volumes:
       - /home/ec2-user/logs:/app/ecs-configurations/dashbase-tables/filebeat/logs:rw
       - /home/ec2-user/logs:/root/.dashbase/logs:rw
@@ -12,6 +31,7 @@ services:
     env_file:
       - saas_kafka_config.env
     environment:
+      - LOCAL_MONITOR_URL=monitor:9888
       - ZOOKEEPER_URL=10.0.0.124:2181
       - LOG=/root/.dashbase/logs/debug.log
       - COMMAND=sleep 10s && dashbase-cli template download ecs-configurations --path /app/ && dashbase-cli --no-verify --distribution release service start table -p 7889 -ap 7989 -r 0 -c /app/ecs-configurations/dashbase-tables/filebeat/conf/config.yml saas-table-0
@@ -30,6 +50,7 @@ services:
     env_file:
       - saas_kafka_config.env
     environment:
+      - LOCAL_MONITOR_URL=monitor:9888
       - ZOOKEEPER_URL=10.0.0.124:2181
       - LOG=/root/.dashbase/logs/debug.log
       - COMMAND=sleep 10s && dashbase-cli template download ecs-configurations --path /app/ && dashbase-cli --no-verify --distribution release service start api -p 9876 -ap 9976 -c /app/ecs-configurations/dashbase-api/conf/config.yml saas-api
@@ -45,6 +66,7 @@ services:
     links:
       - api
     environment:
+      - LOCAL_MONITOR_URL=monitor:9888
       - API_PORT=9876
       - API_HOST=api
       - LOG=/root/.dashbase/logs/debug.log
@@ -52,8 +74,8 @@ services:
 
   raven:
     image: 977933106931.dkr.ecr.us-west-1.amazonaws.com/dashbase/three-eyed-raven
-    cpu_shares: 1024
-    mem_limit: 1g
+    cpu_shares: 512
+    mem_limit: 2g
     ports:
       - "12445:12445"
       - "12545:12545"
