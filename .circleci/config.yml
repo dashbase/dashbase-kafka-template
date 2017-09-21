@@ -18,34 +18,11 @@ jobs:
           name: Sync Config Package to S3
           command: aws s3 cp ~/kafka-configurations.tar.gz s3://dashbase-public/kafka-configurations/
 
-  deploy-ecs-configurations:
-    machine:
-      enabled: true
-    working_directory: ~/dashbase
-    steps:
-      - checkout
-      - run:
-          name: Install AWS CLI
-          command: pip install awscli --upgrade --user
-      - run:
-          name: Create Config Package
-          command: |
-            mv ecs-config-template ecs-configurations
-            tar -zcvf ~/ecs-configurations.tar.gz --exclude="*.git*" --exclude="*.circle*" ecs-configurations
-      - run:
-          name: Sync Config Package to S3
-          command: aws s3 cp ~/ecs-configurations.tar.gz s3://dashbase-public/ecs-configurations/
-
 workflows:
   version: 2
   build:
     jobs:
       - deploy-configurations:
-          filters:
-            branches:
-              only:
-                - master
-      - deploy-ecs-configurations:
           filters:
             branches:
               only:
