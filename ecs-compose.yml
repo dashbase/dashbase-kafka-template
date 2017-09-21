@@ -2,7 +2,7 @@ version: '2'
 
 services:
   monitor:
-    image: dashbase/table
+    image: 977933106931.dkr.ecr.us-west-1.amazonaws.com/dashbase/table
     cpu_shares: 512
     mem_limit: 4g
     ports:
@@ -12,8 +12,6 @@ services:
       - /home/ec2-user/logs:/app/ecs-configurations/dashbase-tables/_system/logs:rw
       - /home/ec2-user/logs:/root/.dashbase/logs:rw
       - /home/ec2-user/index:/data/index:rw
-    links:
-      - zookeeper
     env_file:
       - saas_kafka_config.env
     environment:
@@ -24,6 +22,8 @@ services:
     image: 977933106931.dkr.ecr.us-west-1.amazonaws.com/dashbase/table
     cpu_shares: 2048
     mem_limit: 8g
+    links:
+      - monitor
     volumes:
       - /home/ec2-user/logs:/app/ecs-configurations/dashbase-tables/filebeat/logs:rw
       - /home/ec2-user/logs:/root/.dashbase/logs:rw
@@ -39,6 +39,8 @@ services:
     image: 977933106931.dkr.ecr.us-west-1.amazonaws.com/dashbase/api
     cpu_shares: 512
     mem_limit: 1g
+    links:
+      - monitor
     ports:
       - "9876:9876"
       - "9976:9976"

@@ -26,6 +26,3 @@ logging:
         archivedLogFilenamePattern: ../logs/dashbase-web-%d.log
         archivedFileCount: 9
         timeZone: UTC
-      - type: dashbase
-        url: ${MONITOR_URL}
-        timeZone: UTC
