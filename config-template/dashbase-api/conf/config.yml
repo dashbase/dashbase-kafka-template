@@ -1,6 +1,7 @@
 cluster:
   name: dashbase-api
   url: ${ZOOKEEPER_URL}
+license: dashbase-license.yml
 server:
   applicationConnectors:
     - type: http
